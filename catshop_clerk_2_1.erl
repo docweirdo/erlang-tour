@@ -63,12 +63,13 @@ loop(Catlist) ->
                     ClientPID ! hd(Catlist),
                     loop(tl(Catlist))
             end;
-                
-        {return, Cat} when is_record(Cat, cat) ->
-            loop([Cat | Catlist]);
 
         {ClientPID, terminate} ->
-            ClientPID ! ok
+            ClientPID ! ok;
+                
+        {return, Cat} when is_record(Cat, cat) ->
+            loop([Cat | Catlist])
+
 
     end.
 
