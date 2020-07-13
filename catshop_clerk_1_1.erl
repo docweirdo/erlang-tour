@@ -1,5 +1,5 @@
 -module(catshop_clerk_1_1).
-% hier erklären dass 2 wege gibt; lists und rand import
+% hier erklären, dass 2 wege gibt; lists und rand import
 -import(rand, [uniform/1]).
 -export([make_cat/0]).
 

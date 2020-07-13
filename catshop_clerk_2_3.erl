@@ -15,11 +15,11 @@ start_shift(ForbiddenColor) ->
 order_cat(ClerkPID) ->
     gen_server:call(ClerkPID, {order}).
 
-return_cat(ClerkPID, Cat) ->
-    gen_server:cast(ClerkPID, {return, Cat}).
-
 end_shift(ClerkPID) ->
     gen_server:call(ClerkPID, {terminate}).
+
+return_cat(ClerkPID, Cat) ->
+    gen_server:cast(ClerkPID, {return, Cat}).
 
 %%% Server Funktionen
 init(ForbiddenColor) -> {ok, #state{forbiddenColor = ForbiddenColor, catlist=[]}}.

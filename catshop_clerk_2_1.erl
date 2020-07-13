@@ -1,16 +1,16 @@
--module(catshop_clerk_2_1).     %modulname angepasst
+-module(catshop_clerk_2_1).
 
 -import(rand, [uniform/1]).
--export([start_shift/0, order_cat/1, return_cat/2, end_shift/1, loop/1]).  %start_shift in export, loop raus
+-export([start_shift/0, order_cat/1, return_cat/2, end_shift/1, loop/1]).  
 
 -record(cat, {name, color}).
 
 %%% Client API
-start_shift() -> spawn_link(?MODULE, loop, [[]]).    %module erklären
+start_shift() -> spawn_link(?MODULE, loop, [[]]).
 
 order_cat(ClerkPID) ->
     
-    Ref = erlang:monitor(process, ClerkPID),        %Monitor wegen Absturzgefahr
+    Ref = erlang:monitor(process, ClerkPID),
     ClerkPID ! {self(), order},
     
     receive
