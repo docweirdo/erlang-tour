@@ -1,14 +1,11 @@
--module(catshop_clerk_2_3).     %modulname angepasst
+-module(catshop_clerk_2_3).
 -behaviour(gen_server).         
 
 -import(rand, [uniform/1]).
--export([start_shift/1, order_cat/1, return_cat/2, end_shift/1, handle_call/3, handle_cast/2, init/1]).  %Api and Behaviour function in export
+-export([start_shift/1, order_cat/1, return_cat/2, end_shift/1, handle_call/3, handle_cast/2, init/1]).
 
--record(cat, {name, color}).
--record(state, {forbiddenColor, catlist}).
 
 %%% Client API
-
 start_shift(ForbiddenColor) -> 
     gen_server:start_link(?MODULE, ForbiddenColor, []).
 
@@ -22,36 +19,36 @@ return_cat(ClerkPID, Cat) ->
     gen_server:cast(ClerkPID, {return, Cat}).
 
 %%% Server Funktionen
-init(ForbiddenColor) -> {ok, #state{forbiddenColor = ForbiddenColor, catlist=[]}}.
+init(ForbiddenColor) -> {ok, {ForbiddenColor, []}}.
 
-handle_call({order}, _From, State) ->
+handle_call({order}, _From, {ForbiddenColor, Catlist}) ->
 
     if  
-        State#state.catlist =:= [] ->
-            {reply, make_cat(), State};
+        Catlist == [] ->
+            {reply, make_cat(), {ForbiddenColor, Catlist}};
         
-        State#state.catlist =/= [] ->
-            Cat = hd(State#state.catlist),
-            Catlist = tl(State#state.catlist),
-            {reply, State#state{catlist = Catlist}, Cat}
+        Catlist =/= [] ->
+            Cat = hd(Catlist),
+            TailCatlist = tl(Catlist),
+            {reply, {ForbiddenColor, TailCatlist}, Cat}
     end;
 
 handle_call({terminate}, _From, State) ->
     {stop, normal, ok, State}.
 
-handle_cast({return, Cat}, State) when is_record(Cat, cat) ->
+handle_cast({return, {cat, Name, Color}}, {ForbiddenColor, Catlist}) ->
     if 
-        Cat#cat.color =:= State#state.forbiddenColor ->
-            {stop, bad_color, State};
+        Color =:= ForbiddenColor ->
+            {stop, bad_color, {ForbiddenColor, Catlist}};
 
-        true -> {noreply, State#state{catlist=[Cat | State#state.catlist]}}
+        true -> {noreply, {ForbiddenColor, [{cat, Name, Color} | Catlist]}}
     end.
 
 %%% Private Funktionen
 make_cat() ->
     Name = lists:nth(uniform(11), names()),
     Color = lists:nth(uniform(6), colors()),
-    #cat{name=Name, color=Color}.
+    {cat, Name, Color}.
 
 names() -> ["Karl", "Peter", "Kai-Uwe", "Uwe-Kai", "Nils", "Martha", "Elisabeth", "Jonas", "Gerda", "Katharina", "Franziska"].
 

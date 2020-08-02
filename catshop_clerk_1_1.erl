@@ -2,13 +2,13 @@
 -import(rand, [uniform/1]).
 -export([make_cat/0]).
 
--record(cat, {name, color}).
 
 
 make_cat() ->
     Name = lists:nth(uniform(11), names()),
+    % hier erklären, dass Variablen nur 1x zugewiesen werden können
     Color = lists:nth(uniform(6), colors()),
-    #cat{name=Name, color=Color}.
+    {cat, Name, Color}.
 
 
 %%% Private Funktionen

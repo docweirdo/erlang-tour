@@ -4,7 +4,6 @@
 -import(rand, [uniform/1]).
 -export([start_shift/0, order_cat/1, return_cat/2, end_shift/1, handle_call/3, handle_cast/2, init/1]).
 
--record(cat, {name, color}).
 
 %%% Client API
 start_shift() -> 
@@ -25,7 +24,7 @@ init([]) -> {ok, []}.
 
 handle_call({order}, _From, State) ->
     if  
-        State =:= [] ->
+        State == [] ->
             {reply, make_cat(), State};
         
         State =/= [] ->
@@ -35,15 +34,15 @@ handle_call({order}, _From, State) ->
 handle_call({terminate}, _From, State) ->
     {stop, normal, ok, State}.
 
-handle_cast({return, Cat}, State) when is_record(Cat, cat) ->
-    {noreply, [Cat | State]}.
+handle_cast({return, {cat, Name, Color}}, State) ->
+    {noreply, [{cat, Name, Color} | State]}.
 
 
 %%% Private Funktionen
 make_cat() ->
     Name = lists:nth(uniform(11), names()),
     Color = lists:nth(uniform(6), colors()),
-    #cat{name=Name, color=Color}.
+    {cat, Name, Color}.
 
 names() -> ["Karl", "Peter", "Kai-Uwe", "Uwe-Kai", "Nils", "Martha", "Elisabeth", "Jonas", "Gerda", "Katharina", "Franziska"].
 

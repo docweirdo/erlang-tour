@@ -3,7 +3,6 @@
 -import(rand, [uniform/1]).
 -export([start_shift/0, order_cat/1, return_cat/2, end_shift/1, loop/1]).  
 
--record(cat, {name, color}).
 
 %%% Client API
 start_shift() -> spawn_link(?MODULE, loop, [[]]).
@@ -14,9 +13,9 @@ order_cat(ClerkPID) ->
     ClerkPID ! {self(), order},
     
     receive
-        Cat when is_record(Cat, cat) -> 
+        {cat, Name, Color} -> 
             erlang:demonitor(Ref),
-            Cat;
+            {cat, Name, Color};
 
         {'DOWN', Ref, process, ClerkPID, Reason} ->
             erlang:error(Reason)
@@ -55,7 +54,7 @@ loop(Catlist) ->
 
         {ClientPID, order} ->
             if  
-                Catlist =:= [] ->
+                Catlist == [] ->
                     ClientPID ! make_cat(),
                     loop(Catlist);
                 
@@ -67,8 +66,8 @@ loop(Catlist) ->
         {ClientPID, terminate} ->
             ClientPID ! ok;
                 
-        {return, Cat} when is_record(Cat, cat) ->
-            loop([Cat | Catlist])
+        {return, {cat, Name, Color}} ->
+            loop([{cat, Name, Color} | Catlist])
 
 
     end.
@@ -79,7 +78,7 @@ loop(Catlist) ->
 make_cat() ->
     Name = lists:nth(uniform(11), names()),
     Color = lists:nth(uniform(6), colors()),
-    #cat{name=Name, color=Color}.
+    {cat, Name, Color}.
 
 names() -> ["Karl", "Peter", "Kai-Uwe", "Uwe-Kai", "Nils", "Martha", "Elisabeth", "Jonas", "Gerda", "Katharina", "Franziska"].
 
