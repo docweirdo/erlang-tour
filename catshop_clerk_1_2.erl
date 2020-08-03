@@ -1,6 +1,6 @@
 -module(catshop_clerk_1_2).
 -import(rand, [uniform/1]).
--export([loop/0]).  %loop in export, make_cat raus
+-export([loop/0]).
 
 
 loop() ->   %neue funktion
