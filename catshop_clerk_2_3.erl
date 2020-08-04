@@ -19,29 +19,29 @@ return_cat(ClerkPID, Cat) ->
     gen_server:cast(ClerkPID, {return, Cat}).
 
 %%% Server Funktionen
-init(ForbiddenColor) -> {ok, {ForbiddenColor, []}}.
+init(ForbiddenColor) -> {ok, {state, ForbiddenColor, []}}.
 
-handle_call({order}, _From, {ForbiddenColor, Catlist}) ->
+handle_call({order}, _From, {state, ForbiddenColor, Catlist}) ->
 
     if  
         Catlist == [] ->
-            {reply, make_cat(), {ForbiddenColor, Catlist}};
+            {reply, make_cat(), {state, ForbiddenColor, Catlist}};
         
         Catlist =/= [] ->
             Cat = hd(Catlist),
             TailCatlist = tl(Catlist),
-            {reply, {ForbiddenColor, TailCatlist}, Cat}
+            {reply, {state, ForbiddenColor, TailCatlist}, Cat}
     end;
 
 handle_call({terminate}, _From, State) ->
     {stop, normal, ok, State}.
 
-handle_cast({return, {cat, Name, Color}}, {ForbiddenColor, Catlist}) ->
+handle_cast({return, {cat, Name, Color}}, {state, ForbiddenColor, Catlist}) ->
     if 
         Color =:= ForbiddenColor ->
-            {stop, bad_color, {ForbiddenColor, Catlist}};
+            {stop, bad_color, {state, ForbiddenColor, Catlist}};
 
-        true -> {noreply, {ForbiddenColor, [{cat, Name, Color} | Catlist]}}
+        true -> {noreply, {state, ForbiddenColor, [{cat, Name, Color} | Catlist]}}
     end.
 
 %%% Private Funktionen
