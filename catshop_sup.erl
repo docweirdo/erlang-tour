@@ -4,7 +4,8 @@
 -export([open_shop/0, init/1]).
 
 open_shop() ->
-    supervisor:start_link(?MODULE, []).
+    {ok, SupPID} = supervisor:start_link(?MODULE, []),
+    SupPID.
 
 init([]) ->
     {ok, {{one_for_all, 1, 60},
